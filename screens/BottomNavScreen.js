@@ -8,7 +8,7 @@
  import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
  
  import HomeScreen from './HomeScreen';
- import Categories from './CategoryScreen';
+ import CategoryStack from './CategoryStack';
  import AddRecipe from './AddRecipeScreen';
  import Search from './SearchScreen';
  import Profile from './ProfileScreen';
@@ -50,7 +50,7 @@
         {/* Loads the categories page stack navigation */}
            <BottomTab.Screen
              name="Categories"
-             component={Categories}
+             component={CategoryStack}
              options={{
                  tabBarIcon: ({ color, size }) => (
                    <MaterialCommunityIcons name="apps" color={color} size={size}/>

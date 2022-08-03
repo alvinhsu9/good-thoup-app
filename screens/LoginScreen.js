@@ -16,7 +16,7 @@
         <Text style={styles.intro}>Time for some</Text>
         <Text style={styles.companyName}>GOOD THOUP</Text>
         <View style={styles.logoContainer}>
-            <Image style={styles.logo} source={require('../assets/soupie.png')}/>
+            <Image style={styles.logo} source={require('../assets/soupie.svg')}/>
         </View>
     <View>
          {/* Button links to the home screen with the bottom tab navigation  */}
@@ -67,10 +67,11 @@
    },
    logoContainer: {
      marginBottom: 40,
+     height: 100,
    },
    logo: {
-     width: 85,
-     height: 120,
+     width: '90vw',
+     height: 100,
    },
    intro: {
      color: 'white',

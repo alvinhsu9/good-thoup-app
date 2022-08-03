@@ -4,7 +4,7 @@
  */
  import { StyleSheet, View, FlatList, ActivityIndicator, ScrollView} from 'react-native';
 
- import { SearchBar, Text } from 'react-native-elements';
+ import { Text } from 'react-native-elements';
  
  import React, { useState, useEffect } from 'react';
 
@@ -54,10 +54,10 @@ function displayIngredientContainer(error, isLoaded, dataResult, navigation) {
    const updateSearch = (search) => {
      setSearch(search);
    };
+
    const renderItem = ({ item }) => (
     <MyCategoryItem itemData={item} navigatorRef={navigation}/>
   );
-  
   if (error) {
     // show an error message
     return (
@@ -88,8 +88,9 @@ function displayIngredientContainer(error, isLoaded, dataResult, navigation) {
     return (
       <ScrollView>
           <FlatList
+            style={styles.listContainer}
             data={dataResult.categories}
-            numColumns={2}
+            numColumns={1}
             renderItem={renderItem}
             keyExtractor={item => item.strCategory}
           />
@@ -105,5 +106,10 @@ function displayIngredientContainer(error, isLoaded, dataResult, navigation) {
      backgroundColor: '#F6F0EE',
      alignItems: 'center',
      justifyContent: 'flex-start',
+     width: '100%',
+   },
+   listContainer: {
+    width: '100vw',
+    backgroundColor: '#EFF0F3',
    },
  });

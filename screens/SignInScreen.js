@@ -19,7 +19,7 @@
    return (
      <View style={styles.container}>
         <View style={styles.logoContainer}>
-            <Image style={styles.logo} source={require('../assets/soupie.png')}/>
+            <Image style={styles.logo} source={require('../assets/soupie.svg')}/>
         </View>
         <Text style={styles.formTitle}>Email or Username</Text>
         <View style={styles.inputView}>
@@ -80,10 +80,11 @@
     },
     logoContainer: {
       marginBottom: 40,
+      height: 100,
     },
     logo: {
-      width: 85,
-      height: 120,
+      width: '90vw',
+      height: 100,
     },
     intro: {
       color: 'white',
