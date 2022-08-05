@@ -4,9 +4,11 @@
 
  import React, { useRef, useState, useEffect } from 'react';
 
+ import AsyncStorage from '@react-native-async-storage/async-storage';
+
  import { StyleSheet, View, ScrollView, TouchableOpacity, Dimensions, FlatList } from 'react-native';
  
- import { Text, Button, Image, Card } from 'react-native-elements';
+ import { Text, Image, Card } from 'react-native-elements';
 
  import { getFeaturedData, FeaturedData } from '../data/FeaturedData';
 
@@ -14,12 +16,19 @@
 
  import Carousel from 'react-native-anchor-carousel';
 
+ import { getFavArray } from '../services/FavouritesManager';
+import { ActivityIndicator } from 'react-native-web';
+
  export default function HomeScreen( { navigation } ) {
 
-    // add the three useState for the fetch process
+    // useState for random banner pic
+
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [dataResult, setDataResult] = useState([]);
+    const [uid, setUid] = useState(0);
+    const [arrFav, setArrFav] = useState([]);
+    
  
     // add useEffect for the fetch process 
     useEffect(() => {
@@ -29,8 +38,8 @@
         .then(
           (result) => {
             // successful load
-            setIsLoaded(true);
             setDataResult(result);
+            setIsLoaded(true);
           },
           (error) => {
             // handle errors here
@@ -40,15 +49,45 @@
         )
       },
      []);
+
+     const getId = async () => {
+        try {
+            let currUser = await AsyncStorage.getItem('currUser');
+            setUid(currUser);
+        } catch (e) {
+            console.log('error: ' + e);
+        }
+     }
+
+     getId();
+
+     useEffect(() => {
+        getFavArray(uid)
+        .then(
+            (result) => {
+                if(result !== null) {
+                    setArrFav(JSON.parse(result));
+                    
+                } else {
+                    setArrFav([]);
+                }
+            },
+            (error) => {
+                console.log('error: '+ error);
+            }
+        )
+     });
+
+    //  console.log(arrFav);
  
      return (
        <View style={styles.container}>
-             {homeDisplay( dataResult, )}
+             {homeDisplay( dataResult, isLoaded )}
          </View>
    );
  }
  
-  function homeDisplay( dataResult, itemData ) {
+  function homeDisplay( dataResult, isLoaded ) {
 
      // reference is needed for onPress handler
   const carouselRef = useRef(null);
@@ -56,11 +95,7 @@
   // screen width is needed for container
   const { width: windowWidth } = Dimensions.get('window');
 
-  const homeRandomizer = ({ item }) => (
-    <MyRandomImage itemData={item} navigatorRef={navigation}/>
-  );
-
-  const renderItem = ({ item, index, }) => (
+  const renderItem = ({ index, }) => (
     // touchable opacity for the carousel
     <TouchableOpacity
       activeOpacity={.7}
@@ -84,14 +119,19 @@
     </TouchableOpacity>
   );
 
+      if(isLoaded) {
+
      return (
-         <ScrollView>
-            <View style={styles.container}>
-            <FlatList 
+         <ScrollView style={styles.container}>
+            {/* <FlatList 
               style={styles.itemThumb}  
               data={dataResult.meals}
               renderItem={homeRandomizer}
-              keyExtractor={item => item.idMeal}/>
+              keyExtractor={item => item.idMeal}/> */}
+              <View style={styles.banner}>
+                <MyRandomImage itemData={dataResult.meals[0]}/>
+              </View>
+              <View>
                 <Text style={styles.heading}>Featured Recipes</Text>
                 {/* carousel  */}
                 <Carousel
@@ -111,21 +151,32 @@
             
                       ref={carouselRef}
                     />
+                </View>
+                <View>
                 <Text style={styles.heading}>Your Favourites</Text>
                 <Card style={styles.favouriteCard}>
                   <Text>Recipe Image Here</Text>
                   <Text>Recipe Name Here</Text>
                 </Card>
-            </View>
+                </View>
          </ScrollView>
        );
+        } else {
+            <View>
+                <Text>Loading...</Text>
+                <ActivityIndicator size='large' color="#abd1c6"/>
+            </View>
+        }
      }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F6F0EE',
-        justifyContent: 'flex-start',
+        // justifyContent: 'flex-start',
+    },
+    banner: {
+        height: "40%",
     },
     heading: {
       textAlign: "center",

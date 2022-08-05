@@ -2,8 +2,10 @@
  * - This view will load the bottom tab navigation for the app  
  * - it is part of the stack navigation on the login screen page
  */
-
-
+import {useState, useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Text, Button} from 'react-native-elements';
  import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
  import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
  
@@ -12,11 +14,75 @@
  import AddRecipe from './AddRecipeScreen';
  import Search from './SearchScreen';
  import Profile from './ProfileScreen';
+import backgroundTwo from '../assets/soup-1.jpg';
  
  const BottomTab = createBottomTabNavigator();
  
  
- export default function Home() {
+ export default function Home({route}) {
+    const {email, pw} = route.params;
+    const [infoCorrect, setInfoCorrect] = useState(false);
+    const [uid, setUid] = useState(0);
+    const [fav, setFav] = useState([]);
+
+    
+    const checkLogin = () => {
+
+        useEffect(() => {
+            fetch('https://thoupapi.alvinhsu.ca/api/v1/users/read.php?email=' + email + '&pw=' + pw)
+            .then (res => res.json())
+            .then(
+                (result) => {
+                    if (result !== null) {
+                    setInfoCorrect(true);
+                    setUid(result);
+                    }
+                },
+                (error) => {             
+                    setInfoCorrect(false);
+                    console.log('error: ' + error);
+                }
+            )
+        }, [uid]);
+        
+        //if correct, get user's favorites
+        useEffect(() => {
+            fetch('https://thoupapi.alvinhsu.ca/api/v1/users/getFaves.php?id=' + uid)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setFav(result);
+                    //and put it into local storage
+                    storeUserData();
+                },
+                (error) => {
+                    console.log('error: ' + error);
+                }
+            )
+        });
+
+        return infoCorrect;
+    }
+
+    // AsyncStorage.clear();
+
+    const storeUserData = async () => {
+        
+        try {
+            await AsyncStorage.setItem('currUser', uid)
+        } catch (e) {
+            console.log('error: ' + e);
+        }
+
+        try {
+          await AsyncStorage.setItem(uid, JSON.stringify(fav))
+        } catch (e) {
+          // saving error
+          console.log('error: ' + e);
+        }
+      }
+    
+    if (checkLogin()) {
      return (
          <BottomTab.Navigator
            screenOptions={{
@@ -126,4 +192,48 @@
            />
          </BottomTab.Navigator>
      );
+    } else {
+        return(
+            <View style={styles.container}>
+                <Text style={styles.error}>Login info incorrect. Please make sure your information entered is correct.</Text>
+                <Button
+                title={"Try Again"}
+                onPress = {() => navigation.navigate('SignInScreen')}
+                buttonStyle={{backgroundColor:'#F9BC60', borderRadius: 25,}}
+                containerStyle={{
+                    width: 150,
+                }}
+                titleStyle={{
+                    color: 'white',
+                    fontFamily: 'Roboto_400Regular'
+                }}
+                />
+            </View>
+        );
+    }
  }
+
+ const styles=StyleSheet.create({
+    container: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        position: 'relative',
+        backgroundImage: `url(${backgroundTwo})`,
+        backgroundPosition:'center', 
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+    },
+    error: {
+        backgroundColor: 'rgba(255,97,98,0.8)',
+        width: '80%',
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        marginBottom: 30,
+        borderRadius: 20,
+        justifyContent: 'center',
+        color: '#fff',
+    }
+ }) 

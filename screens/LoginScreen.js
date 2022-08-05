@@ -34,7 +34,7 @@
            }}
          />
          {/* Button links to the home screen with the bottom tab navigation  */}
-         <Button 
+         {/* <Button 
            title="Create account"
            onPress={() => navigation.navigate('SignInScreen')}
            buttonStyle={{backgroundColor:'#F9BC60', borderRadius: 25,}}
@@ -45,7 +45,7 @@
              color: 'white',
              fontFamily: 'Roboto_400Regular'
            }}
-         />
+         /> */}
        </View>
        <Text style={styles.info}>*Terms and conditions</Text>
      </View>

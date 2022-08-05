@@ -3,9 +3,9 @@
  * - Displays the sign in and create account buttons as well as the logo
  * 
  */
- import React, { useState, useEffect } from 'react';
+ import React, { useState} from 'react';
 
- import { StyleSheet, View, TextInput, SafeAreaView } from 'react-native';
+ import { StyleSheet, View, TextInput } from 'react-native';
 
  import { Text, Button, Image } from 'react-native-elements';
 
@@ -14,7 +14,7 @@
  export default function SignInScreen({ navigation }) {
     
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [pw, setPassword] = useState('');
 
    return (
      <View style={styles.container}>
@@ -49,7 +49,7 @@
             {/* Button links to the home screen with the bottom tab navigation  */}
             <Button 
             title="Sign In"
-            onPress={() => navigation.navigate('BottomNavScreen')}
+            onPress={() => navigation.navigate('BottomNavScreen', {email: email, pw: pw})}
             buttonStyle={{backgroundColor:'#F9BC60', borderRadius: 25,}}
             containerStyle={{
                 width: 150,

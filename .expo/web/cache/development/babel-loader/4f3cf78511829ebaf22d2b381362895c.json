@@ -1,0 +1,1 @@
+{"ast":null,"code":"export var currUser = {\n  id: \"\"\n};","map":{"version":3,"names":["currUser","id"],"sources":["C:/Users/miche/OneDrive/Documents/GitHub/good-thoup-app/services/LoginManager.js"],"sourcesContent":["export const currUser = {\r\n    id: \"\"\r\n}"],"mappings":"AAAA,OAAO,IAAMA,QAAQ,GAAG;EACpBC,EAAE,EAAE;AADgB,CAAjB"},"metadata":{},"sourceType":"module"}

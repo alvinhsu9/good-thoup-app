@@ -14,6 +14,7 @@ import { ZenMaruGothic_400Regular } from '@expo-google-fonts/zen-maru-gothic';
 import LoginScreen from './screens/LoginScreen';
 import SignInScreen from './screens/SignInScreen';
 import BottomNavScreen from './screens/BottomNavScreen';
+import HomeScreen from './screens/HomeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,7 +52,9 @@ function App() {
           }}>
           <Stack.Screen
             name="Login"
+            // name="HomeScreen"
             component={LoginScreen}
+            // component={HomeScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen
