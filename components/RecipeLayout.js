@@ -2,47 +2,52 @@
  * - This view will show the layout page of what a single recipe looks like
  */
 
+import { useState, useEffect } from 'react';
  import { StyleSheet, View, ScrollView } from 'react-native';
  import { Text, Button, Image } from 'react-native-elements';
+
+ import { addFavorite, checkFavorite, delFavorite, getFavArray, updateFavArray } from '../services/FavouritesManager';
  
- export default function RecipeLayout({ item }) {
+ export default function RecipeLayout({ item, currUser}) {
    
    // object key example to extract the ingredients data
  
-     let drink = item.drinks[0];
-     let arrKeys = Object.keys(item.drinks[0]).filter(curr => curr.slice(0, 13) === 'strIngredient');
- 
-     console.log(arrKeys);  
+     let meal = item.meals[0];
+     let arrKeys = Object.keys(item.meals[0]).filter(curr => curr.slice(0, 13) === 'strIngredient');
+  
  
      let mappedIngMeas = arrKeys.map((currIng) => {
          let currNum = Number.parseInt(currIng.replace('strIngredient', ''));
  
          let retItem = {
              key: currNum,
-             name: item.drinks[0][currIng],
-             measure: item.drinks[0]['strMeasure' + currNum]
+             name: item.meals[0][currIng],
+             measure: item.meals[0]['strMeasure' + currNum]
          };
          return retItem;
      });
- 
-     console.log(mappedIngMeas);
- 
+
      mappedIngMeas = mappedIngMeas.filter(curr => curr.name != '' && curr.name !=null);
- 
-     console.log(mappedIngMeas);
  
      const ingredientItem = mappedIngMeas.map((currItem) =>
      <Text key={currItem.key} style={styles.ingredientItem}>- {currItem.measure} {currItem.name}</Text>
      );
- 
+
+     //favorites
+     const [isFav, setIsFav] = useState(null);
+     
+
+
+     initFavoriteState(currUser, item, setIsFav);
+
      return (
      <ScrollView>
        <View style={styles.container}>
              {/* Banner image and name of recipe  */}
              <View style={styles.recipeBannerContainer}>
-                 <Text style={styles.heading}>{meals.strMeal}</Text>
+                 <Text style={styles.heading}>{meal.strMeal}</Text>
                  <View style={styles.imageOverlay}>
-                 <Image style={styles.recipeImage}  source={{ uri: drink.strMealThumb }}
+                 <Image style={styles.recipeImage}  source={{ uri: meal.strMealThumb }}
                  />
                  </View>
              </View>
@@ -50,6 +55,7 @@
              <View style={styles.buttonDiv}>
              <Button style={styles.button} 
              title="Save recipe" 
+             onPress={toggleFav(currUser, item, isFav, setIsFav )}
              buttonStyle={{
                  backgroundColor: '#2C2A31',
              }}/>
@@ -63,7 +69,7 @@
                  <View style={styles.instructionsContainer}>
                        {/* recipe instructions  */}
                      <Text style={styles.text}>Instructions</Text>
-                     <Text style={styles.recipeText}>{drink.strInstructions}</Text>
+                     <Text style={styles.recipeText}>{meal.strInstructions}</Text>
                  </View>
              </View>
          </View>
@@ -71,6 +77,59 @@
      </ScrollView>
      );
  }
+
+ function initFavoriteState(currUser, currMeal, setIsFav) {
+  useEffect(() => {
+    //get fave list from local storage
+      getFavArray(currUser)
+      .then(
+        (result) => {
+          const currFavList = JSON.parse(result);
+
+          //determine whether this meal is in the favorites list
+          if(currFavList !== null) {
+            setIsFav(checkFavorite(currMeal.idMeal, currFavList))
+          } else {
+            setIsFav(false);
+          }
+        }, 
+        (e) => {
+          console.log('error: ' + e);
+        }
+      )
+  })
+ }
+
+  function toggleFav(currUser, currMeal, isFav, setIsFav) {
+    let currFavList;
+
+    getFavArray(currUser)
+    .then (
+      (result) => {
+        currFavList = JSON.parse(result);
+
+        if(currFavList === null) {
+          currFavList = [];
+        }
+
+        if(isFav) {
+
+          let updatedFavList = delFavorite(currMeal, currFavList, currUser);
+          updateFavArray(currUser, updatedFavList);
+
+        } else {
+          addFavorite(currMeal,currFavList, currUser);
+          updateFavArray(currUser, currFavList);
+        }
+      }, 
+      (error) => {
+        console.log('error: ' + error);
+      }
+    )
+    .then(
+      setIsFav(!isFav)
+    )
+  }
  
  const styles = StyleSheet.create({
      ingredientItem: {

@@ -17,6 +17,7 @@
  import Carousel from 'react-native-anchor-carousel';
 
  import { getFavArray } from '../services/FavouritesManager';
+ import { getCurrUser } from '../services/LoginManager';
 import { ActivityIndicator } from 'react-native-web';
 
  export default function HomeScreen( { navigation } ) {
@@ -28,8 +29,22 @@ import { ActivityIndicator } from 'react-native-web';
     const [dataResult, setDataResult] = useState([]);
     const [uid, setUid] = useState(0);
     const [arrFav, setArrFav] = useState([]);
-    
- 
+
+    useEffect(() => {
+      getCurrUser()
+      .then(
+        (result) => {
+          let res = JSON.parse(result)
+          if(res !== null) {
+            setUid(res);
+          }
+        }, 
+        (error) => {
+          console.log('error: ' + error);
+        }
+      )
+    })
+
     // add useEffect for the fetch process 
     useEffect(() => {
        // API call for list of drink categories to display in the explore section
@@ -50,40 +65,34 @@ import { ActivityIndicator } from 'react-native-web';
       },
      []);
 
-     const getId = async () => {
+    //  useEffect(() => {
+    //         fetch('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id=' + uid)
+    //         .then(res => res.json())
+    //         .then(
+    //             (result) => {
+    //                 setArrFav(result);
+    //                 //and put it into local storage
+    //             },
+    //             (error) => {
+    //                 console.log('error: ' + error);
+    //             }
+    //         )
+    //     });
+      
+      const storeFaves = async () => {
         try {
-            let currUser = await AsyncStorage.getItem('currUser');
-            setUid(currUser);
+          await AsyncStorage.setItem(uid, JSON.stringify(fav))
         } catch (e) {
-            console.log('error: ' + e);
+          // saving error
+          console.log('error: ' + e);
         }
-     }
-
-     getId();
-
-     useEffect(() => {
-        getFavArray(uid)
-        .then(
-            (result) => {
-                if(result !== null) {
-                    setArrFav(JSON.parse(result));
-                    
-                } else {
-                    setArrFav([]);
-                }
-            },
-            (error) => {
-                console.log('error: '+ error);
-            }
-        )
-     });
-
-    //  console.log(arrFav);
+      }
  
      return (
-       <View style={styles.container}>
+       <ScrollView style={styles.container}>
              {homeDisplay( dataResult, isLoaded )}
-         </View>
+             {favoritesDisplay(arrFav, isLoaded)}
+        </ScrollView>
    );
  }
  
@@ -122,12 +131,7 @@ import { ActivityIndicator } from 'react-native-web';
       if(isLoaded) {
 
      return (
-         <ScrollView style={styles.container}>
-            {/* <FlatList 
-              style={styles.itemThumb}  
-              data={dataResult.meals}
-              renderItem={homeRandomizer}
-              keyExtractor={item => item.idMeal}/> */}
+         <View style={styles.container}>
               <View style={styles.banner}>
                 <MyRandomImage itemData={dataResult.meals[0]}/>
               </View>
@@ -152,14 +156,8 @@ import { ActivityIndicator } from 'react-native-web';
                       ref={carouselRef}
                     />
                 </View>
-                <View>
-                <Text style={styles.heading}>Your Favourites</Text>
-                <Card style={styles.favouriteCard}>
-                  <Text>Recipe Image Here</Text>
-                  <Text>Recipe Name Here</Text>
-                </Card>
-                </View>
-         </ScrollView>
+                
+         </View>
        );
         } else {
             <View>
@@ -167,6 +165,36 @@ import { ActivityIndicator } from 'react-native-web';
                 <ActivityIndicator size='large' color="#abd1c6"/>
             </View>
         }
+     }
+
+     function favoritesDisplay(arrFav, isLoaded) {
+
+      const renderItem = ({index}) => {
+        <Card style={styles.favouriteCard}>
+            <Text>Recipe Image Here</Text>
+            <Text>Recipe Name Here</Text>
+          </Card>
+      }
+
+      if (arrFav !== [] ) {
+
+      return (
+        <View styles={styles.container}>
+          <Text style={styles.heading}>Your Favourites</Text>
+          <FlatList 
+          keyExtractor={item => item.id}
+          data={arrFav}
+          renderItem={renderItem}/>
+        </View>
+      );
+      } else {
+        return (
+        <View styles={styles.container}>
+          <Text>No Favorites.</Text>
+        </View>
+        )
+      }
+
      }
 
 const styles = StyleSheet.create({

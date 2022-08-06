@@ -23,19 +23,16 @@ import backgroundTwo from '../assets/soup-1.jpg';
     const {email, pw} = route.params;
     const [infoCorrect, setInfoCorrect] = useState(false);
     const [uid, setUid] = useState(0);
-    const [fav, setFav] = useState([]);
-
-    
-    const checkLogin = () => {
+    // const [fav, setFav] = useState([]);
 
         useEffect(() => {
-            fetch('https://thoupapi.alvinhsu.ca/api/v1/users/read.php?email=' + email + '&pw=' + pw)
+            fetch('https://thoupapi.michellecheung.net/api/v1/users/read.php?email=' + email + '&pw=' + pw)
             .then (res => res.json())
             .then(
                 (result) => {
                     if (result !== null) {
-                    setInfoCorrect(true);
-                    setUid(result);
+                      setUid(result);
+                      setInfoCorrect(true);
                     }
                 },
                 (error) => {             
@@ -43,26 +40,25 @@ import backgroundTwo from '../assets/soup-1.jpg';
                     console.log('error: ' + error);
                 }
             )
-        }, [uid]);
+        }, []);
         
         //if correct, get user's favorites
-        useEffect(() => {
-            fetch('https://thoupapi.alvinhsu.ca/api/v1/users/getFaves.php?id=' + uid)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setFav(result);
-                    //and put it into local storage
-                    storeUserData();
-                },
-                (error) => {
-                    console.log('error: ' + error);
-                }
-            )
-        });
+        // useEffect(() => {
+        //     fetch('https://thoupapi.alvinhsu.ca/api/v1/users/getFaves.php?id=' + uid)
+        //     .then(res => res.json())
+        //     .then(
+        //         (result) => {
+        //             setFav(result);
+        //             //and put it into local storage
+        //             storeUserData();
+        //         },
+        //         (error) => {
+        //             console.log('error: ' + error);
+        //         }
+        //     )
+        // });
 
-        return infoCorrect;
-    }
+       
 
     // AsyncStorage.clear();
 
@@ -73,16 +69,10 @@ import backgroundTwo from '../assets/soup-1.jpg';
         } catch (e) {
             console.log('error: ' + e);
         }
-
-        try {
-          await AsyncStorage.setItem(uid, JSON.stringify(fav))
-        } catch (e) {
-          // saving error
-          console.log('error: ' + e);
-        }
       }
     
-    if (checkLogin()) {
+    if(infoCorrect) {
+      storeUserData();
      return (
          <BottomTab.Navigator
            screenOptions={{

@@ -11,6 +11,8 @@
 
  import RecipeLayout from '../components/RecipeLayout';
 
+ import { getCurrUser } from '../services/LoginManager';
+
  export default function SingleRecipe({route}) {
 
       const { idMeal } = route.params;
@@ -20,17 +22,33 @@
       const [error, setError] = useState(null);
       const [isLoaded, setIsLoaded] = useState(false);
       const [dataResult, setDataResult] = useState([]);
+      const [uid, setUid] = useState(0);
+
+      useEffect(() => {
+      getCurrUser()
+      .then(
+        (result) => {
+          let res = JSON.parse(result)
+          if(res !== null) {
+            setUid(res);
+          }
+        }, 
+        (error) => {
+          console.log('error: ' + error);
+        }
+      )
+    })
 
       // add useEffect for the fetch process 
       // calls the API that looks up drinks by specific ID to show full details 
       useEffect(() => {
-          fetch('www.themealdb.com/api/json/v1/1/lookup.php?i=' + idMeal)
+          fetch('https://www.themealdb.com/api/json/v1/1/lookup.php?i='+idMeal)
           .then(res => res.json())
           .then(
             (result) => {
-              // successful load
-              setIsLoaded(true);
+              // successful load              
               setDataResult(result);
+              setIsLoaded(true);
               console.log(result);
             },
             (error) => {
@@ -44,12 +62,12 @@
 
     return (     
         <View style={styles.container}>
-             {displayRecipe(error, isLoaded, dataResult)}
+             {displayRecipe(error, isLoaded, dataResult, uid)}
         </View>
     );
  }
 
- function displayRecipe(error, isLoaded, dataResult, navigation) {
+ function displayRecipe(error, isLoaded, dataResult, uid) {
    
 if (error) {
  // show an error message
@@ -82,6 +100,7 @@ else {
     {/* goes to RecipeLayout.js which prints the layout of the page design */}
       <RecipeLayout
       item = {dataResult}
+      currUser = {uid}
       />
    </ScrollView>
 

@@ -10,7 +10,7 @@
 
  import CategoryLayout from '../components/CategoryLayout';
 
- export default function SingleCategoryScreen({route}) {
+ export default function SingleCategoryScreen({route, navigation}) {
 
       const { idMeal } = route.params;
       console.log(idMeal);
@@ -44,12 +44,12 @@
 
     return (     
         <View style={styles.container}>
-             {displayRecipe(error, isLoaded, dataResult)}
+             {displayRecipe(error, isLoaded, dataResult, navigation)}
         </View>
     );
  }
 
- function displayRecipe(error, isLoaded, dataResult, navigation, itemData) {
+ function displayRecipe(error, isLoaded, dataResult, navigation) {
 
     const renderItem = ({ item }) => (
         <CategoryLayout itemData={item} navigatorRef={navigation}/>
