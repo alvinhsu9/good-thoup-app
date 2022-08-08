@@ -45,9 +45,8 @@ import { ActivityIndicator } from 'react-native-web';
       )
     })
 
-    // add useEffect for the fetch process 
+    // get random banner image
     useEffect(() => {
-       // API call for list of drink categories to display in the explore section
         fetch('https://www.themealdb.com/api/json/v1/1/random.php')
         .then(res => res.json())
         .then(
@@ -65,38 +64,38 @@ import { ActivityIndicator } from 'react-native-web';
       },
      []);
 
-    //  useEffect(() => {
-    //         fetch('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id=' + uid)
-    //         .then(res => res.json())
-    //         .then(
-    //             (result) => {
-    //                 setArrFav(result);
-    //                 //and put it into local storage
-    //             },
-    //             (error) => {
-    //                 console.log('error: ' + error);
-    //             }
-    //         )
-    //     });
+     useEffect(() => {
+            fetch('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id=' + uid)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setArrFav(result);
+                },
+                (error) => {
+                    console.log('error: ' + error);
+                }
+            )
+        });
       
       const storeFaves = async () => {
-        try {
-          await AsyncStorage.setItem(uid, JSON.stringify(fav))
-        } catch (e) {
-          // saving error
-          console.log('error: ' + e);
-        }
+          try {
+            await AsyncStorage.setItem(uid + '_arrFav', JSON.stringify(arrFav))
+          } catch (e) {
+            // saving error
+            console.log('error: ' + e);
+          }
       }
- 
+    
+      storeFaves();
+      
      return (
-       <ScrollView style={styles.container}>
-             {homeDisplay( dataResult, isLoaded )}
-             {favoritesDisplay(arrFav, isLoaded)}
-        </ScrollView>
+       <View style={styles.container}>
+             {homeDisplay( dataResult, isLoaded)}
+        </View>
    );
  }
  
-  function homeDisplay( dataResult, isLoaded ) {
+  function homeDisplay( dataResult, isLoaded) {
 
      // reference is needed for onPress handler
   const carouselRef = useRef(null);
@@ -131,7 +130,7 @@ import { ActivityIndicator } from 'react-native-web';
       if(isLoaded) {
 
      return (
-         <View style={styles.container}>
+         <ScrollView style={styles.container}>
               <View style={styles.banner}>
                 <MyRandomImage itemData={dataResult.meals[0]}/>
               </View>
@@ -157,7 +156,7 @@ import { ActivityIndicator } from 'react-native-web';
                     />
                 </View>
                 
-         </View>
+         </ScrollView>
        );
         } else {
             <View>
@@ -167,35 +166,6 @@ import { ActivityIndicator } from 'react-native-web';
         }
      }
 
-     function favoritesDisplay(arrFav, isLoaded) {
-
-      const renderItem = ({index}) => {
-        <Card style={styles.favouriteCard}>
-            <Text>Recipe Image Here</Text>
-            <Text>Recipe Name Here</Text>
-          </Card>
-      }
-
-      if (arrFav !== [] ) {
-
-      return (
-        <View styles={styles.container}>
-          <Text style={styles.heading}>Your Favourites</Text>
-          <FlatList 
-          keyExtractor={item => item.id}
-          data={arrFav}
-          renderItem={renderItem}/>
-        </View>
-      );
-      } else {
-        return (
-        <View styles={styles.container}>
-          <Text>No Favorites.</Text>
-        </View>
-        )
-      }
-
-     }
 
 const styles = StyleSheet.create({
     container: {
@@ -208,7 +178,7 @@ const styles = StyleSheet.create({
     },
     heading: {
       textAlign: "center",
-      marginTop: 25,
+      marginTop: 50,
       fontSize: 30,
       fontWeight: 800,
       fontFamily: 'Roboto_400Regular',

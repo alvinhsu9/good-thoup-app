@@ -4,10 +4,9 @@
 
  import React, { useState, useEffect } from 'react';
 
- import { StyleSheet, View, Image, ScrollView, ActivityIndicator } from 'react-native';
+ import { StyleSheet, View, ScrollView, ActivityIndicator } from 'react-native';
 
-
- import { Text, Button } from 'react-native-elements';
+ import { Text } from 'react-native-elements';
 
  import RecipeLayout from '../components/RecipeLayout';
 
@@ -16,7 +15,6 @@
  export default function SingleRecipe({route}) {
 
       const { idMeal } = route.params;
-      console.log(idMeal);
 
       // add the three useState for the fetch process
       const [error, setError] = useState(null);
@@ -24,9 +22,30 @@
       const [dataResult, setDataResult] = useState([]);
       const [uid, setUid] = useState(0);
 
+      // add useEffect for the fetch process 
+      // calls the API that looks up drinks by specific ID to show full details 
+      useEffect(() => {
+        fetch('https://www.themealdb.com/api/json/v1/1/lookup.php?i=' + idMeal)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            setIsLoaded(true);
+            setDataResult(result);
+            
+          },
+          // Note: it's important to handle errors here
+          // instead of a catch() block so that we don't swallow
+          // exceptions from actual bugs in components.
+          (error) => {
+            setIsLoaded(true);
+            setError(error);
+          }
+        )
+      }, []);
+
       useEffect(() => {
       getCurrUser()
-      .then(
+      .then (
         (result) => {
           let res = JSON.parse(result)
           if(res !== null) {
@@ -37,75 +56,52 @@
           console.log('error: ' + error);
         }
       )
-    })
-
-      // add useEffect for the fetch process 
-      // calls the API that looks up drinks by specific ID to show full details 
-      useEffect(() => {
-          fetch('https://www.themealdb.com/api/json/v1/1/lookup.php?i='+idMeal)
-          .then(res => res.json())
-          .then(
-            (result) => {
-              // successful load              
-              setDataResult(result);
-              setIsLoaded(true);
-              console.log(result);
-            },
-            (error) => {
-              // handle errors here
-              setIsLoaded(true);
-              setError(error);        
-            }
-          )
-        },
-      []);
+    });
+    console.log(dataResult.meals);
 
     return (     
         <View style={styles.container}>
-             {displayRecipe(error, isLoaded, dataResult, uid)}
+             {/* {displayRecipe(error, isLoaded, dataResult, uid)} */}
         </View>
+        
     );
  }
 
- function displayRecipe(error, isLoaded, dataResult, uid) {
+function displayRecipe(error, isLoaded, dataResult, uid) {
    
-if (error) {
- // show an error message
- return (
-   <View>
-     <Text>Error: {error.message}</Text>
-   </View>
- );
-}
-else if (!isLoaded) {
- // show the ActivityIndicator (spinner)
- return (
-   <View>
-     <Text>Preparing...</Text>
-     <ActivityIndicator size="large" color="#ffffff"/>
-   </View>
- );
-}
-else if (dataResult.meals === undefined) {
- // not an error but no drinks, so show a message
- return (
-   <View>
-     <Text>There are no records found for this search</Text>
-   </View>
- );
-}
-else {
- return (
-   <ScrollView>
-    {/* goes to RecipeLayout.js which prints the layout of the page design */}
-      <RecipeLayout
-      item = {dataResult}
-      currUser = {uid}
-      />
-   </ScrollView>
-
- );
-}
+  if (error) {
+  // show an error message
+    return (
+      <View>
+        <Text>Error: {error.message}</Text>
+      </View>
+    );
+  }
+  else if (!isLoaded) {
+  // show the ActivityIndicator (spinner)
+    return (
+      <View>
+        <Text>Preparing...</Text>
+        <ActivityIndicator size="large" color="#ABD1C6"/>
+      </View>
+    );
+  } else if (dataResult === undefined) {
+    return (
+      <View>
+        <Text>No Results</Text>
+      </View>
+    );
+  } else {
+    return (
+      <ScrollView>
+        {/* goes to RecipeLayout.js which prints the layout of the page design */}
+          <RecipeLayout
+          item = {dataResult.meals}
+          currUser = {uid}
+          />
+      </ScrollView>
+    );
+  }
 }
  
  const styles = StyleSheet.create({

@@ -26,7 +26,7 @@
                         fontSize: 20,
                     }}
                     onPress={() => navigatorRef.navigate('SingleCategory', {
-                        idMeal: itemData.strCategory,
+                        category: itemData.strCategory,
                     })}
                  />
          </View>
@@ -53,6 +53,7 @@
          marginBottom: 15,
          width: '60%',
          borderRadius: 25,
+         border: 'none',
          backgroundColor: '#ABD1C6',
      },
      itemColAlpha: {

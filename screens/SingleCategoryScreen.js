@@ -1,5 +1,5 @@
 /**
- * - This view will load a single recipe 
+ * - This view will load a single Category
  */
 
  import React, { useState, useEffect } from 'react';
@@ -12,8 +12,7 @@
 
  export default function SingleCategoryScreen({route, navigation}) {
 
-      const { idMeal } = route.params;
-      console.log(idMeal);
+      const { category } = route.params;
 
       // add the three useState for the fetch process
       const [error, setError] = useState(null);
@@ -24,14 +23,13 @@
       // calls the API that looks up meals by specific ID to show full details 
 
       useEffect(() => {
-        fetch('https://www.themealdb.com/api/json/v1/1/filter.php?c=' + idMeal)
+        fetch('https://www.themealdb.com/api/json/v1/1/filter.php?c=' + category)
           .then(res => res.json())
           .then(
             (result) => {
               // successful load
               setIsLoaded(true);
               setDataResult(result);
-              console.log(result);
             },
             (error) => {
               // handle errors here
@@ -44,7 +42,8 @@
 
     return (     
         <View style={styles.container}>
-             {displayRecipe(error, isLoaded, dataResult, navigation)}
+            <Text style={styles.heading}>{category}</Text>
+            {displayRecipe(error, isLoaded, dataResult, navigation)}
         </View>
     );
  }
@@ -103,6 +102,13 @@
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
+   heading: {
+    color: '#2C2A31',
+    fontSize: 30,
+    marginTop: 10,
+    marginBottom: 10,
+    fontFamily: 'Roboto_400Regular',
+   },
   recipeBannerContainer: {
     display: "flex",
     flexDirection: "column",

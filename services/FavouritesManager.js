@@ -4,7 +4,7 @@ import {useEffect} from 'react';
 export async function getFavArray(uid) {
     let arrFav = [];
     try { 
-        arrFav = await AsyncStorage.getItem(uid)
+        arrFav = await AsyncStorage.getItem(uid + '_arrFav')
     } catch(e) {
         console.log('error: '+e);
     }
@@ -14,22 +14,24 @@ export async function getFavArray(uid) {
 
 export async function updateFavArray(uid, arrFav) {
     try {
-        await AsyncStorage.setItem(uid, arrFav)
+        await AsyncStorage.setItem(uid + '_arrFav', arrFav)
     } catch (e) {
         console.log('error: ' + e);
     }
 }
 
 export function checkFavorite(checkKey, currFavList) {
-    let i = currFavList.findIndex(item => item.id == checkKey);
-    if(i >= 0) {
-        return true;
+    if (currFavList !== []) {
+        let i = currFavList.findIndex(item => item.rid == checkKey);
+        if(i >= 0) {
+            return true;
+        }
+        return false;
     }
-    return false;
+    return true;
 }
 
 export function addFavorite(newMeal, currFavList, currUser) {
-    
 
     if(!checkFavorite(newMeal.idMeal, currFavList)) {
         let count = currFavList.length();

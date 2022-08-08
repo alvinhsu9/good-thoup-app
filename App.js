@@ -52,7 +52,7 @@ function App() {
           }}>
           <Stack.Screen
             name="Login"
-            // name="HomeScreen"
+            // name="RecipeLayout"
             component={LoginScreen}
             // component={HomeScreen}
             options={{ headerShown: false }}

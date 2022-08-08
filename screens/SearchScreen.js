@@ -5,13 +5,13 @@
  */
  import { StyleSheet, View, FlatList, ActivityIndicator, ScrollView} from 'react-native';
  
- import { SearchBar, Text, Button } from 'react-native-elements';
+ import { SearchBar, Text} from 'react-native-elements';
  
  import React, { useState, useEffect } from 'react';
 
  import MySearchLayout from '../components/MySearchLayout';
  
- export default function RecipesScreen({ navigation }) {
+ export default function Search({ navigation }) {
 
     // add the three useState for the fetch process
     const [error, setError] = useState(null);
@@ -26,7 +26,6 @@
         .then(
           (result) => {
             // successful load
-            console.log('r1');
             setIsLoaded(true);
             setDataResult(result);
           },

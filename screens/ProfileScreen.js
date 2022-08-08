@@ -9,9 +9,27 @@
  import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
  
  import { Text, Button, Image } from 'react-native-elements';
+import { getCurrUser } from '../services/LoginManager';
 
 
- export default function Profile( { navigation } ) {
+ export default function Profile({navigation}) {
+
+  const [currUser, setCurrUser] = useState('0')
+
+    useEffect(() => {
+      getCurrUser()
+      .then(
+        (result) => {
+          let res = JSON.parse(result)
+          if(res !==null) {
+            setCurrUser(result);
+          }
+        },
+        (error) => {
+          console.log('error: ' + error);
+        }
+      )
+    }) 
     return (
       <ScrollView>
         <View style={styles.container}>
@@ -51,6 +69,9 @@
                     fontSize: 11,
                     paddingBottom: 20,
                 }}
+                onPress = {() => navigation.navigate('Favourites', {
+                  currUser: currUser 
+                })}
             />
             <Button 
                 icon={

@@ -4,16 +4,16 @@
 
 import { useState, useEffect } from 'react';
  import { StyleSheet, View, ScrollView } from 'react-native';
- import { Text, Button, Image } from 'react-native-elements';
+ import { Text, Button, Image, Icon } from 'react-native-elements';
 
  import { addFavorite, checkFavorite, delFavorite, getFavArray, updateFavArray } from '../services/FavouritesManager';
  
- export default function RecipeLayout({ item, currUser}) {
+ export default function RecipeLayout({item, currUser}) {
    
    // object key example to extract the ingredients data
- 
-     let meal = item.meals[0];
-     let arrKeys = Object.keys(item.meals[0]).filter(curr => curr.slice(0, 13) === 'strIngredient');
+    console.log(item);
+     let meal = item[0];
+     let arrKeys = Object.keys(meal).filter(curr => curr.slice(0, 13) === 'strIngredient');
   
  
      let mappedIngMeas = arrKeys.map((currIng) => {
@@ -33,12 +33,13 @@ import { useState, useEffect } from 'react';
      <Text key={currItem.key} style={styles.ingredientItem}>- {currItem.measure} {currItem.name}</Text>
      );
 
-     //favorites
-     const [isFav, setIsFav] = useState(null);
      
 
+     //favorites
+     const [isFav, setIsFav] = useState(null);
+     const [arrFav, setArrFav] = useState([]);
 
-     initFavoriteState(currUser, item, setIsFav);
+     initFavoriteState(currUser, item, setIsFav, setArrFav);
 
      return (
      <ScrollView>
@@ -53,12 +54,12 @@ import { useState, useEffect } from 'react';
              </View>
              {/* button to save recipe  */}
              <View style={styles.buttonDiv}>
-             <Button style={styles.button} 
-             title="Save recipe" 
-             onPress={toggleFav(currUser, item, isFav, setIsFav )}
-             buttonStyle={{
-                 backgroundColor: '#2C2A31',
-             }}/>
+             <Icon
+                type='ionicon'
+                name={isFav ? 'heart' : 'heart-outline'}
+                color={isFav !== null ? '#cc0000' : '#E16162'}
+                onPress={() => { toggleFav(currUser, item, isFav, setIsFav, arrFav, setArrFav) }}
+              />
              </View>
              <View style={styles.recipeTextContainer}>
                {/* recipe ingredients  */}
@@ -73,23 +74,23 @@ import { useState, useEffect } from 'react';
                  </View>
              </View>
          </View>
- 
      </ScrollView>
      );
  }
 
- function initFavoriteState(currUser, currMeal, setIsFav) {
+ function initFavoriteState(currUser, currMeal, setIsFav, setArrFav) {
   useEffect(() => {
     //get fave list from local storage
       getFavArray(currUser)
       .then(
         (result) => {
+          if(result !== undefined) {
           const currFavList = JSON.parse(result);
-
-          //determine whether this meal is in the favorites list
-          if(currFavList !== null) {
-            setIsFav(checkFavorite(currMeal.idMeal, currFavList))
-          } else {
+          setArrFav(currFavList);
+          setIsFav(checkFavorite(currMeal.id, currFavList))
+          } 
+          else {
+            setArrFav([]);
             setIsFav(false);
           }
         }, 
@@ -100,41 +101,39 @@ import { useState, useEffect } from 'react';
   })
  }
 
-  function toggleFav(currUser, currMeal, isFav, setIsFav) {
-    let currFavList;
+  function toggleFav(currUser, currMeal, isFav, setIsFav, arrFav, setArrFav) {
+    //if it favorited, remove it 
+    
+    // if (isFav) {
+    //   let updatedFavList = delFavorite(currMeal, arrFav, currUser);
+    //   setArrFav(updatedFavList);
+    //   updateFavArray(currUser, updatedFavList);
+    // } else {
+      //if it is not favorited, add it
+      // addFavorite(currMeal, arrFav);
+      // let newList =  arrFav;
+      // let id = arrFav.length();
+      // const newMeal = {
+      //   id: id,
+      //   uid: currUser,
+      //   rid: currMeal.idMeal,
+      //   name: currMeal.strMeal,
+      //   image: currMeal.strMealThumb
+      // }
+      // newList.push(newMeal);
+      // updateFavArray(currUser, newMeal);
 
-    getFavArray(currUser)
-    .then (
-      (result) => {
-        currFavList = JSON.parse(result);
+    // }
+    
 
-        if(currFavList === null) {
-          currFavList = [];
-        }
-
-        if(isFav) {
-
-          let updatedFavList = delFavorite(currMeal, currFavList, currUser);
-          updateFavArray(currUser, updatedFavList);
-
-        } else {
-          addFavorite(currMeal,currFavList, currUser);
-          updateFavArray(currUser, currFavList);
-        }
-      }, 
-      (error) => {
-        console.log('error: ' + error);
-      }
-    )
-    .then(
-      setIsFav(!isFav)
-    )
+    
+    
   }
  
  const styles = StyleSheet.create({
      ingredientItem: {
          fontSize: 18,
-         color: 'white',
+         color: '#004643',
      },
      container: {
          backgroundColor: '#F6F0EE',
@@ -164,7 +163,7 @@ import { useState, useEffect } from 'react';
          fontSize: 30,
          marginTop: 10,
          marginBottom: 10,
-         fontFamily: 'Inter_400Regular',
+         fontFamily: 'Roboto_400Regular',
        },
        buttonDiv: {
          display: "flex",
@@ -176,7 +175,7 @@ import { useState, useEffect } from 'react';
          width: 125,
        },
        text: {
-         color: "white",
+         color: '#004643',
          textAlign: 'center',
          fontSize: "25px",
          fontWeight: 800,
@@ -194,10 +193,11 @@ import { useState, useEffect } from 'react';
        recipeText: {
          fontSize: "18px",
          marginBottom: 25,
-         color: "white",
+         color: '#004643'
        },
        recipeTextContainer: {
-         backgroundColor: "#7C8483",
+        //  backgroundColor: "#7C8483",
+        
          width: "90vw",
          paddingLeft: 50,
          paddingRight: 50,

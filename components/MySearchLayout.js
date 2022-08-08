@@ -3,13 +3,18 @@
  */
 
  import { Button, Text, Image } from 'react-native-elements';
- import { StyleSheet, View, } from 'react-native';
+ import { StyleSheet, View, TouchableOpacity } from 'react-native';
  
  // added navigatorRef here
  export default function MySearchLayout({ itemData, navigatorRef }) {
    return (    
      <View style={styles.container}>
-         <View style={styles.itemContainer}>
+         <TouchableOpacity 
+            style={styles.itemContainer}
+            onPress = {() => navigatorRef.navigate('RecipeScreen', {
+                idMeal: itemData.idMeal
+            })}
+            >
              <View style={styles.itemColAlpha}>
                  {/* recipe thumbnail image */}
                  <Image style={styles.itemThumb} source={{ uri: itemData.strMealThumb }}
@@ -20,7 +25,7 @@
                  <Text style={styles.itemText}>{itemData.strMeal}</Text>
                  {/* button that links to the specific single recipe page */}
              </View>
-         </View>
+         </TouchableOpacity>
      </View>
    );
  }

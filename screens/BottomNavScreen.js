@@ -13,7 +13,8 @@ import {Text, Button} from 'react-native-elements';
  import CategoryStack from './CategoryStack';
  import AddRecipe from './AddRecipeScreen';
  import Search from './SearchScreen';
- import Profile from './ProfileScreen';
+ import SearchStack from './SearchStack';
+ import ProfileStack from './ProfileStack';
 import backgroundTwo from '../assets/soup-1.jpg';
  
  const BottomTab = createBottomTabNavigator();
@@ -145,7 +146,7 @@ import backgroundTwo from '../assets/soup-1.jpg';
         {/* Loads the search page stack navigation */}
             <BottomTab.Screen
              name="Search"
-             component={Search}
+             component={SearchStack}
              options={{
                  tabBarIcon: ({ color, size }) => (
                    <MaterialCommunityIcons name="magnify" color={color} size={size}/>
@@ -164,7 +165,7 @@ import backgroundTwo from '../assets/soup-1.jpg';
         {/* Loads the profile page stack navigation */}
              <BottomTab.Screen
              name="My Profile"
-             component={Profile}
+             component={ProfileStack}
              options={{
                  tabBarIcon: ({ color, size }) => (
                    <MaterialCommunityIcons name="account-outline" color={color} size={size}/>
