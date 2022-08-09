@@ -11,18 +11,17 @@ import { useState, useEffect } from 'react';
  export default function RecipeLayout({item, currUser}) {
    
    // object key example to extract the ingredients data
-    console.log(item);
+    
      let meal = item[0];
      let arrKeys = Object.keys(meal).filter(curr => curr.slice(0, 13) === 'strIngredient');
-  
- 
+
      let mappedIngMeas = arrKeys.map((currIng) => {
          let currNum = Number.parseInt(currIng.replace('strIngredient', ''));
- 
+
          let retItem = {
              key: currNum,
-             name: item.meals[0][currIng],
-             measure: item.meals[0]['strMeasure' + currNum]
+             name: meal['strIngredient' + currNum],
+             measure: meal['strMeasure' + currNum]
          };
          return retItem;
      });
@@ -33,13 +32,38 @@ import { useState, useEffect } from 'react';
      <Text key={currItem.key} style={styles.ingredientItem}>- {currItem.measure} {currItem.name}</Text>
      );
 
-     
-
      //favorites
      const [isFav, setIsFav] = useState(null);
-     const [arrFav, setArrFav] = useState([]);
+    //  const [arrFav, setArrFav] = useState([]);
 
-     initFavoriteState(currUser, item, setIsFav, setArrFav);
+    //  check if it's in favorites
+  //   useEffect(() => {
+  //   //get fave list from local storage
+  //     getFavArray(currUser)
+  //     .then(
+  //       (result) => {
+  //         if(result !== undefined) {
+  //         const currFavList = JSON.parse(result);
+  //         if (checkFavorite(item.idMeal, currFavList)) {
+  //           setIsFav(true);
+  //           setArrFav(currFavList);
+  //         } else {
+  //           setIsFav(false);
+  //           setArrFav(currFavList);
+  //         }
+  //         } 
+  //         else {
+  //           setArrFav([]);
+  //           setIsFav(false);
+  //         }
+  //       }, 
+  //       (e) => {
+  //         console.log('error: ' + e);
+  //       }
+  //     )
+  // },[]);
+
+     initFaveState(currUser, item, setIsFav);
 
      return (
      <ScrollView>
@@ -58,7 +82,7 @@ import { useState, useEffect } from 'react';
                 type='ionicon'
                 name={isFav ? 'heart' : 'heart-outline'}
                 color={isFav !== null ? '#cc0000' : '#E16162'}
-                onPress={() => { toggleFav(currUser, item, isFav, setIsFav, arrFav, setArrFav) }}
+                onPress={() => {toggleFav(currUser, item, isFav, setIsFav) }}
               />
              </View>
              <View style={styles.recipeTextContainer}>
@@ -78,55 +102,74 @@ import { useState, useEffect } from 'react';
      );
  }
 
- function initFavoriteState(currUser, currMeal, setIsFav, setArrFav) {
+
+ function initFaveState(currUser,currMeal, setIsFav) {
+  
   useEffect(() => {
-    //get fave list from local storage
-      getFavArray(currUser)
-      .then(
-        (result) => {
-          if(result !== undefined) {
-          const currFavList = JSON.parse(result);
-          setArrFav(currFavList);
-          setIsFav(checkFavorite(currMeal.id, currFavList))
-          } 
-          else {
-            setArrFav([]);
-            setIsFav(false);
-          }
-        }, 
-        (e) => {
-          console.log('error: ' + e);
+    getFavArray(currUser)
+    .then(
+      (result) => {
+        const currFavList = JSON.parse(result);
+        if(currFavList !== null || currFavList !== []) {
+          console.log('here');
+          console.log(currFavList);
+          setIsFav(checkFavorite(currMeal[0].idMeal, currFavList))
+        } else {
+          setIsFav(false);
         }
-      )
-  })
+      },
+      (e) => {
+        console.log('error: ' + e);
+      }
+    )
+  }, []);
  }
 
-  function toggleFav(currUser, currMeal, isFav, setIsFav, arrFav, setArrFav) {
-    //if it favorited, remove it 
-    
+  function toggleFav(currUser, currMeal, isFav, setIsFav) {
+
+    let arrFav;
+
+    getFavArray(currUser)
+      .then(
+        (result) => {
+          if(result === [] || result === null) {
+            arrFav = [];
+          } else {
+            let res = JSON.parse(result);
+            arrFav = res;
+          }
+          if(isFav) { 
+            // remove from favourites
+            let updatedFavList = delFavorite(currMeal, arrFav, currUser);
+            updateFavArray(currUser, updatedFavList);
+          } else {
+            // add to favourites
+            addFavorite(currMeal, arrFav, currUser);
+            updateFavArray(currUser, arrFav);
+          }
+          
+        },
+        (error) => {
+          console.log('error: ' + error);
+        }
+      )
+      .then(
+        setIsFav(!isFav)
+      )
+
+    // if it is favorited, remove it 
     // if (isFav) {
     //   let updatedFavList = delFavorite(currMeal, arrFav, currUser);
     //   setArrFav(updatedFavList);
+    //   setIsFav(false);
     //   updateFavArray(currUser, updatedFavList);
+    // } else if (arrFav == [] && !isFav) {
+    //   // if it is not favorited, add it
+      
     // } else {
-      //if it is not favorited, add it
-      // addFavorite(currMeal, arrFav);
-      // let newList =  arrFav;
-      // let id = arrFav.length();
-      // const newMeal = {
-      //   id: id,
-      //   uid: currUser,
-      //   rid: currMeal.idMeal,
-      //   name: currMeal.strMeal,
-      //   image: currMeal.strMealThumb
-      // }
-      // newList.push(newMeal);
-      // updateFavArray(currUser, newMeal);
-
+     
+      
     // }
-    
-
-    
     
   }
  

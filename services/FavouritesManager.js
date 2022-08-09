@@ -1,26 +1,28 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {useEffect} from 'react';
 
 export async function getFavArray(uid) {
     let arrFav = [];
     try { 
         arrFav = await AsyncStorage.getItem(uid + '_arrFav')
     } catch(e) {
-        console.log('error: '+e);
+        console.log('error: '+ e);
     }
 
     return arrFav;
 }
 
 export async function updateFavArray(uid, arrFav) {
+    console.log(uid);
+    console.log(arrFav);
     try {
-        await AsyncStorage.setItem(uid + '_arrFav', arrFav)
+        await AsyncStorage.setItem(uid + '_arrFav', JSON.stringify(arrFav))
     } catch (e) {
         console.log('error: ' + e);
     }
 }
 
 export function checkFavorite(checkKey, currFavList) {
+    
     if (currFavList !== []) {
         let i = currFavList.findIndex(item => item.rid == checkKey);
         if(i >= 0) {
@@ -32,57 +34,29 @@ export function checkFavorite(checkKey, currFavList) {
 }
 
 export function addFavorite(newMeal, currFavList, currUser) {
+    
+    let count = currFavList.length;
 
     if(!checkFavorite(newMeal.idMeal, currFavList)) {
-        let count = currFavList.length();
         const meal = {
             id: count,
             uid: currUser,
-            rid: newMeal.idMeal,
-            name: newMeal.strMeal,
-            image: newMeal.strMealThumb
+            rid: newMeal[0].idMeal,
+            name: newMeal[0].strMeal,
+            image: newMeal[0].strMealThumb
         }
-
-            useEffect(() => {
-            fetch('https://thoupapi.michellecheung.net/api/v1/favourites/create.php?', {
-                headers: {
-                    'Accept': 'application/jsonn',
-                    'Content-Type': 'application/json'
-                }, 
-                method: "POST",
-                body: JSON.stringify(meal) 
-            })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    console.log('Success: ' + result);
-                },
-                (error) => {
-                    console.log('Error: ' + error);
-                }    
-            ) 
-        })
-
-        currFavList.push(meal);
+        if(currFavList === []) {
+            currFavList = [meal];
+        } else {
+            currFavList.push(meal);
+        }
+        
     }
 }
 
-export function delFavorite(delMeal, currFavList, currUser) {
-
-    useEffect(() => {
-        fetch('https://thoupapi.michellecheung.net/api/v1/favorites/delete.php?id=' + currUser + '&rid=' + delMeal.idMeal)
-        .then(res => res.json())
-        .then(
-            (result) => {
-                console.log('Success: ' + result);
-            },
-            (error) => {
-                console.log('Error: ' + error);
-            }    
-        ) 
-    })
-
-    let filteredList = currFavList.filter(item => item.idMeal != delMeal.idMeal);
+export function delFavorite(delMeal, currFavList) {
+    
+    let filteredList = currFavList.filter(item => item.rid != delMeal[0].idMeal);
     return filteredList;
 
 }

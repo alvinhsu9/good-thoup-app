@@ -28,17 +28,16 @@
         fetch('https://www.themealdb.com/api/json/v1/1/lookup.php?i=' + idMeal)
         .then(res => res.json())
         .then(
-          (result) => {
-            setIsLoaded(true);
+          (result) => {            
             setDataResult(result);
-            
+            setIsLoaded(true);
           },
           // Note: it's important to handle errors here
           // instead of a catch() block so that we don't swallow
           // exceptions from actual bugs in components.
-          (error) => {
-            setIsLoaded(true);
+          (error) => {            
             setError(error);
+            setIsLoaded(true);
           }
         )
       }, []);
@@ -57,11 +56,10 @@
         }
       )
     });
-    console.log(dataResult.meals);
 
     return (     
         <View style={styles.container}>
-             {/* {displayRecipe(error, isLoaded, dataResult, uid)} */}
+             {displayRecipe(error, isLoaded, dataResult, uid)}
         </View>
         
     );
@@ -85,13 +83,15 @@ function displayRecipe(error, isLoaded, dataResult, uid) {
         <ActivityIndicator size="large" color="#ABD1C6"/>
       </View>
     );
-  } else if (dataResult === undefined) {
+  }
+   else if (dataResult === undefined) {
     return (
       <View>
         <Text>No Results</Text>
       </View>
     );
-  } else {
+  } 
+   else {
     return (
       <ScrollView>
         {/* goes to RecipeLayout.js which prints the layout of the page design */}

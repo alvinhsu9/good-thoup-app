@@ -13,8 +13,8 @@
  
  export default function SignInScreen({ navigation }) {
     
-    const [email, setEmail] = useState('');
-    const [pw, setPassword] = useState('');
+    const [email, setEmail] = useState('test@bcit.ca');
+    const [pw, setPassword] = useState('appdev');
 
    return (
      <View style={styles.container}>

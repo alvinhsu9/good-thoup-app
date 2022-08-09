@@ -7,7 +7,7 @@
  
  // added navigatorRef here
  export default function RecipesDisplay({ itemData, navigatorRef }) {
-
+    console.log(itemData);
    return (    
      <View style={recipeListStyles.container}>
          <View style={recipeListStyles.itemContainer}>

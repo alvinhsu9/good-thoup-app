@@ -31,9 +31,10 @@ export default function Favourites({navigation}) {
         getFavArray(uid)
         .then (
             (result) => {
-                if (result !== undefined) {
-                    setIsLoaded(true);
-                    setDataResult(result);                    
+                let arrFav = JSON.parse(result);
+                if (arrFav !== []) {                    
+                    setDataResult(arrFav);
+                    setIsLoaded(true);                               
                 } else {
                     setDataResult([]);
                 }
@@ -78,7 +79,7 @@ function displayRecipe(error, isLoaded, dataResult, navigation) {
             </View>
         );
     }
-    else if (dataResult == []) {
+    else if (dataResult == null || dataResult == []) {
     // not an error but no meals, so show a message
         return (
             <View>
