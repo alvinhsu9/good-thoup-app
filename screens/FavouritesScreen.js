@@ -1,65 +1,126 @@
 import { useEffect, useState } from 'react';
 import {View, Text, ActivityIndicator, StyleSheet, FlatList} from 'react-native';
+import {Button} from 'react-native-elements';
 import { getFavArray } from '../services/FavouritesManager';
 import { getCurrUser } from '../services/LoginManager';
-import CategoryLayout from '../components/CategoryLayout';
+import FavouritesItem from '../components/FavouritesItem';
 
-export default function Favourites({navigation}) {
+export default function Favourites({route, navigation}) {
     
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [dataResult, setDataResult] = useState([]);
-    const [uid, setUid] = useState(0)
 
- 
+    const { currUser } = route.params;
+
     useEffect(() => {
-      getCurrUser()
-      .then(
-        (result) => {
-          let res = JSON.parse(result)
-          if(res !== null) {
-            setUid(res);
-          }
-        }, 
-        (error) => {
-          console.log('error: ' + error);
-        }
-      )
-    })
-    
-    useEffect(() => {
-        getFavArray(uid)
+        getFavArray(currUser)
         .then (
             (result) => {
-                let arrFav = JSON.parse(result);
-                if (arrFav !== []) {                    
-                    setDataResult(arrFav);
-                    setIsLoaded(true);                               
-                } else {
-                    setDataResult([]);
-                }
+                let arrFav = JSON.parse(result);                                   
+                setDataResult(arrFav);  
+                setIsLoaded(true);
             },
-            (error) => {
+            (error) => {               
                 console.log('error: ' + error);
                 setError(error);
                 setIsLoaded(true);
             }
-        )
-    })
+        ) 
 
+        const willFocusSubscription = navigation.addListener('focus', () => {
+        getFavArray(currUser)
+        .then(
+            (result) => {           
+            setDataResult(JSON.parse(result));
+            setIsLoaded(true);
+            },
+            (error) => {
+            setError(error);
+            setIsLoaded(true);
+            }
+        )
+        });
+
+    return willFocusSubscription;
+    },[]);
 
     return(
-        <View>
-            <Text>My Favourites</Text>
+        <View style={styles.container}>
+            <Text style ={styles.heading}>My Favourites</Text>
+            <Button
+            title="Sync Favourites"
+            buttonStyle = {{
+                backgroundColor:"#F9BC60",
+                paddingVertical: 10,
+            }}
+            containerStyle={{
+                width: 150,
+                marginTop: 20,
+                marginBottom: 40,
+                borderRadius: 25
+            }}
+            titleStyle={{
+                color: 'white',
+                fontFamily: 'Roboto_400Regular',
+                fontSize: 16,
+            }}
+            onPress={() => {syncFavourites(currUser, dataResult)}}
+            />
             {displayRecipe(error, isLoaded, dataResult, navigation)}
         </View>
-    )
-
+    );
 }
 
+function syncFavourites(currUser, locArr) {
+
+    //get favourites from api
+    let dbArr;
+    fetch ('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id='+currUser)
+    .then(res => res.json())
+    .then(
+        (result) => {
+            dbArr = result;
+            console.log(dbArr);
+        },
+        (error) => {
+            console.log('error: ' + error)
+        }
+    )
+    
+    //check which one is shorter
+    if(locArr.length < dbArr.length) {
+        //item(s) was deleted
+        //find intersection
+        //add intersection list to db
+
+    } if (locArr.length > dbArr.length) {
+        //item(s) was added
+
+    }
+
+    //update if there are any differences
+    
+    
+        // fetch('https://thoupapi.michellecheung.net/api/v1/users/create.php', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(arrFav) 
+        // })
+    
+        
+}
+
+
 function displayRecipe(error, isLoaded, dataResult, navigation) {
+    
+
     const renderItem = (item) => {
-        <CategoryLayout itemData={item} navigatorRef={navigation}/> 
+        return (
+        <FavouritesItem item={item} navigatorRef={navigation}/> 
+        );
     }
 
     if (error) {
@@ -79,7 +140,7 @@ function displayRecipe(error, isLoaded, dataResult, navigation) {
             </View>
         );
     }
-    else if (dataResult == null || dataResult == []) {
+    else if (dataResult == []) {
     // not an error but no meals, so show a message
         return (
             <View>

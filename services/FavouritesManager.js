@@ -12,8 +12,6 @@ export async function getFavArray(uid) {
 }
 
 export async function updateFavArray(uid, arrFav) {
-    console.log(uid);
-    console.log(arrFav);
     try {
         await AsyncStorage.setItem(uid + '_arrFav', JSON.stringify(arrFav))
     } catch (e) {

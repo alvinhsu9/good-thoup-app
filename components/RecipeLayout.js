@@ -34,35 +34,6 @@ import { useState, useEffect } from 'react';
 
      //favorites
      const [isFav, setIsFav] = useState(null);
-    //  const [arrFav, setArrFav] = useState([]);
-
-    //  check if it's in favorites
-  //   useEffect(() => {
-  //   //get fave list from local storage
-  //     getFavArray(currUser)
-  //     .then(
-  //       (result) => {
-  //         if(result !== undefined) {
-  //         const currFavList = JSON.parse(result);
-  //         if (checkFavorite(item.idMeal, currFavList)) {
-  //           setIsFav(true);
-  //           setArrFav(currFavList);
-  //         } else {
-  //           setIsFav(false);
-  //           setArrFav(currFavList);
-  //         }
-  //         } 
-  //         else {
-  //           setArrFav([]);
-  //           setIsFav(false);
-  //         }
-  //       }, 
-  //       (e) => {
-  //         console.log('error: ' + e);
-  //       }
-  //     )
-  // },[]);
-
      initFaveState(currUser, item, setIsFav);
 
      return (
@@ -111,8 +82,6 @@ import { useState, useEffect } from 'react';
       (result) => {
         const currFavList = JSON.parse(result);
         if(currFavList !== null || currFavList !== []) {
-          console.log('here');
-          console.log(currFavList);
           setIsFav(checkFavorite(currMeal[0].idMeal, currFavList))
         } else {
           setIsFav(false);

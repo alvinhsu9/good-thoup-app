@@ -89,7 +89,7 @@ import { ActivityIndicator } from 'react-native-web';
       storeFaves();
       
      return (
-       <View style={styles.container}>
+        <View style={styles.container}>
              {homeDisplay( dataResult, isLoaded)}
         </View>
    );

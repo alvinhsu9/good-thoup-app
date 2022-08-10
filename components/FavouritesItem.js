@@ -1,23 +1,20 @@
-/**
- * - This view will loads the flatlist of recipes with stylings attached 
- */
+import {View, StyleSheet, Text, Image} from 'react-native';
+import { Button } from 'react-native-elements';
 
- import { Button, Text, Image } from 'react-native-elements';
- import { StyleSheet, View, } from 'react-native';
- 
- // added navigatorRef here
- export default function RecipesDisplay({ itemData, navigatorRef }) {
-   return (    
+
+export default function FavouritesItem({item, navigatorRef}) {
+    item = item.item;
+    return (    
      <View style={recipeListStyles.container}>
          <View style={recipeListStyles.itemContainer}>
              <View style={recipeListStyles.itemColAlpha}>
                  {/* recipe thumbnail image */}
-                 <Image style={recipeListStyles.itemThumb} source={{ uri: itemData.strMealThumb }}
+                 <Image style={recipeListStyles.itemThumb} source={{ uri: item.image }}
                  />
              </View>
              <View style={recipeListStyles.itemColBeta}>
                  {/* recipe name */}
-                 <Text style={recipeListStyles.itemText}>{itemData.strMeal}</Text>
+                 <Text style={recipeListStyles.itemText}>{item.name}</Text>
                  {/* button that links to the specific single recipe page */}
                  <Button 
                      title="View Recipe"
@@ -37,16 +34,16 @@
                          fontSize: 11,
                      }}
                      onPress={() => navigatorRef.navigate('RecipeScreen', {
-                         idMeal: itemData.idMeal,
+                         idMeal: item.rid
                      })}
                  />
              </View>
          </View>
      </View>
    );
- }
- 
- const recipeListStyles = StyleSheet.create({
+}
+
+const recipeListStyles = StyleSheet.create({
      container: {
          width: '100vw',
      },
