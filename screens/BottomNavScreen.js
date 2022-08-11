@@ -42,24 +42,6 @@ import backgroundTwo from '../assets/soup-1.jpg';
                 }
             )
         }, []);
-        
-        //if correct, get user's favorites
-        // useEffect(() => {
-        //     fetch('https://thoupapi.alvinhsu.ca/api/v1/users/getFaves.php?id=' + uid)
-        //     .then(res => res.json())
-        //     .then(
-        //         (result) => {
-        //             setFav(result);
-        //             //and put it into local storage
-        //             storeUserData();
-        //         },
-        //         (error) => {
-        //             console.log('error: ' + error);
-        //         }
-        //     )
-        // });
-
-        // AsyncStorage.clear();
 
     const storeUserData = async () => {
         

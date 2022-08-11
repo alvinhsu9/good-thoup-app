@@ -5,7 +5,7 @@
  */
  import { StyleSheet, View, FlatList, ActivityIndicator, ScrollView} from 'react-native';
  
- import { SearchBar, Text} from 'react-native-elements';
+ import { SearchBar, Text, Button} from 'react-native-elements';
  
  import React, { useState, useEffect } from 'react';
 
@@ -17,43 +17,46 @@
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [dataResult, setDataResult] = useState([]);
+    // gets state for the search bar
+    const [searchTerm, setSearchTerm] = useState("");
+    
+    // updates the search bar as user types 
+    const updateSearch = (search) => {
+    setSearchTerm(search);
+    };
 
-    // add useEffect for the fetch process 
-    useEffect(() => {
-      // API call for recipes that start with the letter A
-        fetch('https://www.themealdb.com/api/json/v1/1/search.php?f=b')
-        .then(res => res.json())
-        .then(
-          (result) => {
-            // successful load
-            setIsLoaded(true);
-            setDataResult(result);
-          },
-          (error) => {
-            // handle errors here
-            setIsLoaded(true);
-            setError(error);        
-          }
-        )
-      },
-     []);
- 
    return (
        <View style={styles.container}>
+        <View style={styles.topBarContainer}>
+                <Text >Type in a letter to look for recipes!</Text>
+                <SearchBar 
+                    inputContainerStyle={styles.searchInputContainer}
+                    containerStyle={styles.searchContainer}
+                    placeholder="Search recipes by first letter..."
+                    onChangeText={updateSearch}
+                    value={searchTerm}
+                />
+                <Button 
+                title={'Search'}
+                onPress={() => {onSearchPressed(searchTerm, setIsLoaded, setDataResult, setError)}} 
+                buttonStyle={{backgroundColor:'#F9BC60', borderRadius: 25,}}
+                containerStyle={{
+                    width: 150,
+                    marginBottom: 10
+                }}
+                titleStyle={{
+                    color: 'white',
+                    fontFamily: 'Roboto_400Regular'
+                }}
+                />
+             </View>
              {displayRecipeContainer(error, isLoaded, dataResult, navigation)}
          </View>
    );
  }
 
  function displayRecipeContainer(error, isLoaded, dataResult, navigation) {
-   
-     // gets state for the search bar
-     const [search, setSearch] = useState("");
- 
-     // updates the search bar as user types 
-   const updateSearch = (search) => {
-     setSearch(search);
-   };
+
 
   const renderItem = ({ item }) => (
     <MySearchLayout itemData={item} navigatorRef={navigation}/>
@@ -89,15 +92,6 @@
     return (
       <ScrollView>
          {/* search bar  */}
-             <View style={styles.topBarContainer}>
-               <SearchBar 
-                 inputContainerStyle={styles.searchInputContainer}
-                 containerStyle={styles.searchContainer}
-                 placeholder="Search recipes..."
-                 onChangeText={updateSearch}
-                 value={search}
-               />
-             </View>
              <FlatList
               data={dataResult.meals}
               renderItem={renderItem}
@@ -106,6 +100,27 @@
       </ScrollView>
     );
    }
+ }
+
+ function onSearchPressed(searchTerm, setIsLoaded, setDataResult, setError) {
+    console.log(searchTerm);
+    // add useEffect for the fetch process 
+    
+        // API call for recipes that start with the letter A
+          fetch('https://www.themealdb.com/api/json/v1/1/search.php?f=' + searchTerm)
+          .then(res => res.json())
+          .then(
+            (result) => {
+              // successful load
+              setIsLoaded(true);
+              setDataResult(result);
+            },
+            (error) => {
+              // handle errors here
+              setIsLoaded(true);
+              setError(error);        
+            }
+          )
  }
 
  
@@ -126,6 +141,7 @@
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
+    alignItems: "center",
     marginTop: 15,
   },
   searchContainer: {
@@ -150,5 +166,14 @@
     marginLeft: 'auto',
     marginRight: 'auto',
     marginBottom: 20,
+  }, 
+  text: {
+    color: '#2C2A31',
+    fontSize: 18,
+    marginTop: 10,
+    marginBottom: 10,
+    fontFamily: 'Roboto_400Regular',
+    flex: 1,
+    justifyContent: 'center'
   }
  });

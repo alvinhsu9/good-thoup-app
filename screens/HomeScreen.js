@@ -16,11 +16,11 @@
 
  import Carousel from 'react-native-anchor-carousel';
 
- import { getFavArray, updateFavArray } from '../services/FavouritesManager';
+ import { updateFavArray } from '../services/FavouritesManager';
  import { getCurrUser } from '../services/LoginManager';
 import { ActivityIndicator } from 'react-native-web';
 
- export default function HomeScreen( { navigation } ) {
+ export default function HomeScreen( {  } ) {
 
     // useState for random banner pic
 
@@ -28,7 +28,6 @@ import { ActivityIndicator } from 'react-native-web';
     const [isLoaded, setIsLoaded] = useState(false);
     const [dataResult, setDataResult] = useState([]);
     const [uid, setUid] = useState(0);
-    // const [arrFav, setArrFav] = useState([]);
 
     useEffect(() => {
       getCurrUser()
@@ -113,6 +112,11 @@ import { ActivityIndicator } from 'react-native-web';
                 <MyRandomImage itemData={dataResult.meals[0]}/>
               </View>
               <View>
+                <Text style={styles.h1}>
+                    Welcome Back!
+                </Text>
+              </View>
+              <View>
                 <Text style={styles.heading}>Featured Recipes</Text>
                 {/* carousel  */}
                 <Carousel
@@ -170,16 +174,24 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F6F0EE',
-        // justifyContent: 'flex-start',
     },
     banner: {
         height: "40%",
     },
+    h1: {
+        textAlign: "center",
+        marginTop: 50,
+        fontSize:30,
+        fontWeight: 800,
+        fontFamily: 'Roboto_400Regular',
+        color: '#004643',
+
+    },
     heading: {
       textAlign: "center",
       marginTop: 50,
-      fontSize: 30,
-      fontWeight: 800,
+      fontSize: 20,
+      fontWeight: 500,
       fontFamily: 'Roboto_400Regular',
       color: '#004643',
     },
