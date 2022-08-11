@@ -16,7 +16,7 @@
 
  import Carousel from 'react-native-anchor-carousel';
 
- import { getFavArray } from '../services/FavouritesManager';
+ import { getFavArray, updateFavArray } from '../services/FavouritesManager';
  import { getCurrUser } from '../services/LoginManager';
 import { ActivityIndicator } from 'react-native-web';
 
@@ -28,7 +28,7 @@ import { ActivityIndicator } from 'react-native-web';
     const [isLoaded, setIsLoaded] = useState(false);
     const [dataResult, setDataResult] = useState([]);
     const [uid, setUid] = useState(0);
-    const [arrFav, setArrFav] = useState([]);
+    // const [arrFav, setArrFav] = useState([]);
 
     useEffect(() => {
       getCurrUser()
@@ -63,30 +63,8 @@ import { ActivityIndicator } from 'react-native-web';
         )
       },
      []);
-
-     useEffect(() => {
-            fetch('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id=' + uid)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setArrFav(result);
-                },
-                (error) => {
-                    console.log('error: ' + error);
-                }
-            )
-        });
       
-      const storeFaves = async () => {
-          try {
-            await AsyncStorage.setItem(uid + '_arrFav', JSON.stringify(arrFav))
-          } catch (e) {
-            // saving error
-            console.log('error: ' + e);
-          }
-      }
-    
-      storeFaves();
+      storeFaves(uid);
       
      return (
         <View style={styles.container}>
@@ -165,6 +143,37 @@ import { ActivityIndicator } from 'react-native-web';
             </View>
         }
      }
+
+    //  const storeFaves = async () => {
+    //     try {
+    //       await AsyncStorage.setItem(uid + '_arrFav', JSON.stringify(arrFav))
+    //     } catch (e) {
+    //       // saving error
+    //       console.log('error: ' + e);
+    //     }
+    // }
+
+   function storeFaves(uid) {
+
+        let arrFav;
+        
+        useEffect(() => {
+            fetch('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id=' + uid)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    arrFav = result;
+                    console.log(arrFav);
+                    updateFavArray(uid, arrFav);
+                },
+                (error) => {
+                    console.log('error: ' + error);
+                }
+            )
+        });
+        
+        updateFavArray(uid, arrFav);
+    }
 
 
 const styles = StyleSheet.create({

@@ -76,42 +76,71 @@ function syncFavourites(currUser, locArr) {
 
     //get favourites from api
     let dbArr;
-    fetch ('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id='+currUser)
+
+    fetch ('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id='+ currUser)
     .then(res => res.json())
     .then(
         (result) => {
-            dbArr = result;
+            dbArr = result; 
             console.log(dbArr);
         },
         (error) => {
             console.log('error: ' + error)
         }
     )
-    
-    //check which one is shorter
-    if(locArr.length < dbArr.length) {
-        //item(s) was deleted
-        //find intersection
-        //add intersection list to db
 
-    } if (locArr.length > dbArr.length) {
-        //item(s) was added
+    console.log(dbArr);
+   
+    if(dbArr !== undefined) {
+        console.log(dbArr);
+        //check which one is shorter
+        if (locArr.length < dbArr.length) {
+            //item(s) was deleted
+            //find intersection
+            let diff = dbArr
+                    .filter(x => !locArr.includes(x))
+                    .concat(locArr.filter(x => !dbArr.includes(x)));
+            //add intersection list to db
+            for(let i=0; i<diff.length; i++) {
+                fetch('https://thoupapi.michellecheung.net/api/v1/favourites/delete.php?id=' + currUser + '&rid=' + diff[i].rid)
+            }
+            
 
+        } else if (locArr.length > dbArr.length) {
+            //item(s) was added
+            //find added items
+            let added = locArr
+                        .filter(x => !dbArr.includes(x))
+                        .concat(dbArr.filter(x => !locArr.includes(x)));
+
+            for (let i=0; i<added.length; i++) {
+
+                fetch('https://thoupapi.michellecheung.net/api/v1/users/create.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(added[i]) 
+                })
+
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        console.log(result);
+                    },
+                    (error) => {
+                        console.log('error: ' + error );
+                    }
+                )
+            }
+        }
     }
 
     //update if there are any differences
-    
-    
-        // fetch('https://thoupapi.michellecheung.net/api/v1/users/create.php', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(arrFav) 
-        // })
-    
         
 }
+
+
 
 
 function displayRecipe(error, isLoaded, dataResult, navigation) {

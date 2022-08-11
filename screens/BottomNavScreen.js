@@ -59,9 +59,7 @@ import backgroundTwo from '../assets/soup-1.jpg';
         //     )
         // });
 
-       
-
-    // AsyncStorage.clear();
+        // AsyncStorage.clear();
 
     const storeUserData = async () => {
         

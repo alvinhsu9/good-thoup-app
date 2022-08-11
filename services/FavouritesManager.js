@@ -12,6 +12,7 @@ export async function getFavArray(uid) {
 }
 
 export async function updateFavArray(uid, arrFav) {
+    
     try {
         await AsyncStorage.setItem(uid + '_arrFav', JSON.stringify(arrFav))
     } catch (e) {
@@ -32,9 +33,8 @@ export function checkFavorite(checkKey, currFavList) {
 }
 
 export function addFavorite(newMeal, currFavList, currUser) {
-    
-    let count = currFavList.length;
 
+    let count = currFavList.length;
     if(!checkFavorite(newMeal.idMeal, currFavList)) {
         const meal = {
             id: count,
@@ -48,7 +48,7 @@ export function addFavorite(newMeal, currFavList, currUser) {
         } else {
             currFavList.push(meal);
         }
-        
+
     }
 }
 

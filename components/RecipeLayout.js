@@ -125,20 +125,6 @@ import { useState, useEffect } from 'react';
       .then(
         setIsFav(!isFav)
       )
-
-    // if it is favorited, remove it 
-    // if (isFav) {
-    //   let updatedFavList = delFavorite(currMeal, arrFav, currUser);
-    //   setArrFav(updatedFavList);
-    //   setIsFav(false);
-    //   updateFavArray(currUser, updatedFavList);
-    // } else if (arrFav == [] && !isFav) {
-    //   // if it is not favorited, add it
-      
-    // } else {
-     
-      
-    // }
     
   }
  
