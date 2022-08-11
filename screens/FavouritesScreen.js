@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import {View, Text, ActivityIndicator, StyleSheet, FlatList} from 'react-native';
 import {Button} from 'react-native-elements';
 import { getFavArray } from '../services/FavouritesManager';
-import { getCurrUser } from '../services/LoginManager';
 import FavouritesItem from '../components/FavouritesItem';
 
 export default function Favourites({route, navigation}) {
@@ -72,72 +71,96 @@ export default function Favourites({route, navigation}) {
     );
 }
 
-function syncFavourites(currUser, locArr) {
+async function syncFavourites(currUser, locArr) {
 
     //get favourites from api
-    let dbArr;
-
-    fetch ('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id='+ currUser)
-    .then(res => res.json())
-    .then(
-        (result) => {
-            dbArr = result; 
-            console.log(dbArr);
-        },
-        (error) => {
-            console.log('error: ' + error)
-        }
-    )
-
+    let dbArr = await getDbFaves(currUser);
     console.log(dbArr);
    
     if(dbArr !== undefined) {
-        console.log(dbArr);
         //check which one is shorter
         if (locArr.length < dbArr.length) {
             //item(s) was deleted
             //find intersection
-            let diff = dbArr
-                    .filter(x => !locArr.includes(x))
-                    .concat(locArr.filter(x => !dbArr.includes(x)));
-            //add intersection list to db
-            for(let i=0; i<diff.length; i++) {
-                fetch('https://thoupapi.michellecheung.net/api/v1/favourites/delete.php?id=' + currUser + '&rid=' + diff[i].rid)
-            }
-            
+            console.log('deleting');
+            let diff = checkDeleted(locArr, dbArr);
+            syncDelete(diff, currUser);
 
         } else if (locArr.length > dbArr.length) {
             //item(s) was added
             //find added items
-            let added = locArr
-                        .filter(x => !dbArr.includes(x))
-                        .concat(dbArr.filter(x => !locArr.includes(x)));
-
-            for (let i=0; i<added.length; i++) {
-
-                fetch('https://thoupapi.michellecheung.net/api/v1/users/create.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(added[i]) 
-                })
-
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        console.log(result);
-                    },
-                    (error) => {
-                        console.log('error: ' + error );
-                    }
-                )
-            }
+            console.log('adding');
+            //check which ones were added
+            let added = checkAdded(locArr, dbArr);
+            syncAdd(added);
         }
     }
-
     //update if there are any differences
-        
+}
+
+async function getDbFaves(currUser) {
+    return fetch ('https://thoupapi.michellecheung.net/api/v1/users/getFaves.php?id='+ currUser)
+    .then(res => res.json())
+}
+
+function checkAdded(locArr, dbArr) {
+    return locArr.filter(x => {
+        return !dbArr.some(y => {
+            return x.rid == y.rid;
+        })
+    })
+}
+
+function checkDeleted(locArr, dbArr) {
+    return dbArr.filter(x => {
+        return !locArr.some(y => {
+            return x.rid == y.rid;
+        })
+    })
+}
+
+function syncAdd(added) {
+    
+    for (let i=0; i<added.length; i++) {
+
+        fetch('https://thoupapi.michellecheung.net/api/v1/favourites/create.php', {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Accept": 'application.json',
+                "Content-Type": "application/json; charsetUTF=8",                
+            },
+            body: JSON.stringify(added[i]) 
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                console.log(result);
+            },
+            (error) => {
+                console.log('error: ' + error );
+            }
+        )
+    }
+}
+
+function syncDelete(diff, currUser) {
+    
+        //add intersection list to db
+        for(let i=0; i<diff.length; i++) {
+            fetch('https://thoupapi.michellecheung.net/api/v1/favourites/delete.php?uid=' + currUser + '&rid='+ diff[i].rid, {
+                method: "DELETE"
+            })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result)
+                },
+                (error) => {
+                    console.log('error: ' + error );
+                }
+            )
+        }
 }
 
 

@@ -144,15 +144,6 @@ import { ActivityIndicator } from 'react-native-web';
         }
      }
 
-    //  const storeFaves = async () => {
-    //     try {
-    //       await AsyncStorage.setItem(uid + '_arrFav', JSON.stringify(arrFav))
-    //     } catch (e) {
-    //       // saving error
-    //       console.log('error: ' + e);
-    //     }
-    // }
-
    function storeFaves(uid) {
 
         let arrFav;
@@ -163,7 +154,6 @@ import { ActivityIndicator } from 'react-native-web';
             .then(
                 (result) => {
                     arrFav = result;
-                    console.log(arrFav);
                     updateFavArray(uid, arrFav);
                 },
                 (error) => {
